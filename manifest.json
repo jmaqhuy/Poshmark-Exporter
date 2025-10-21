@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Poshmark Closet Exporter",
+  "version": "2.0",
+  "description": "Xuất tất cả sản phẩm và URL hình ảnh từ tủ đồ Poshmark sang tệp XLSX.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://poshmark.com/*"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    },
+    "default_title": "Export Poshmark Closet"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  }
+}
