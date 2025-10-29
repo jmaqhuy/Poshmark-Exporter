@@ -151,6 +151,7 @@ async function startPoshmarkExport() {
       filename = `poshmark_${closetUsername}_search_${sanitizedQuery}.xlsx`;
     } else {
       filename = `poshmark_${closetUsername}_all_listings.xlsx`;
+      dataForSheet.pop(); // xóa Meet your posher
     }
     
     XLSX.writeFile(wb, filename);
