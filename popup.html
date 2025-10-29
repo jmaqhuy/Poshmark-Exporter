@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poshmark Exporter</title>
+    <style>
+        /* --- Reset & Base --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2d3748;
+            width: 380px;
+            min-height: 500px;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- Header --- */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 24px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #ffffff;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Content Area --- */
+        .content {
+            padding: 24px 20px;
+        }
+
+        h2 {
+            font-size: 16px;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h2::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+            margin: 24px 0;
+        }
+
+        /* --- Form --- */
+        #configForm {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 13px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* --- Message --- */
+        #message {
+            padding: 12px 16px;
+            margin-top: 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #message.success {
+            background-color: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #48bb78;
+            display: block;
+        }
+
+        #message.error {
+            background-color: #fed7d7;
+            color: #742a2a;
+            border-left: 4px solid #f56565;
+            display: block;
+        }
+
+        /* --- Config List --- */
+        #configList {
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        #configList::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #configList::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        #configList::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        #configList::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+
+        .empty-list {
+            color: #a0aec0;
+            font-style: italic;
+            text-align: center;
+            padding: 32px 16px;
+            font-size: 13px;
+        }
+
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 14px;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .config-item:hover {
+            border-color: #cbd5e0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .config-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+            border-color: #667eea;
+            border-width: 2px;
+        }
+
+        .config-name {
+            font-weight: 600;
+            color: #2d3748;
+            word-break: break-all;
+            font-size: 15px;
+            display: block;
+        }
+
+        .config-item.active .config-name {
+            color: #667eea;
+        }
+
+        .config-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .config-actions button {
+            flex: 1;
+            min-width: 80px;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-activate {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .btn-activate:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+        }
+
+        .btn-activate:disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #fbd38d 0%, #f6ad55 100%);
+            color: #744210;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(246, 173, 85, 0.3);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(245, 101, 101, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Quản lý Cloudinary</h1>
+            <p>Thêm hoặc chọn tài khoản để tải ảnh lên</p>
+        </div>
+
+        <div class="content">
+            <!-- Form để thêm/sửa -->
+            <form id="configForm">
+                <div class="form-group">
+                    <label for="cloudName">Cloud Name:</label>
+                    <input type="text" id="cloudName" name="cloudName" required>
+                </div>
+                <div class="form-group">
+                    <label for="apiKey">API Key:</label>
+                    <input type="text" id="apiKey" name="apiKey" required>
+                </div>
+                <div class="form-group">
+                    <label for="apiSecret">API Secret:</label>
+                    <input type="password" id="apiSecret" name="apiSecret" required>
+                </div>
+                <button type="submit" id="saveButton" class="btn btn-primary">Thêm & Xác thực</button>
+            </form>
+
+            <!-- Nơi hiển thị thông báo -->
+            <div id="message" class="message"></div>
+
+            <hr>
+
+            <!-- Danh sách các tài khoản đã lưu -->
+            <h2>Tài khoản đã lưu</h2>
+            <div id="configList">
+                <!-- Danh sách sẽ được chèn vào đây bởi JS -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Script phải được đặt ở cuối body -->
+    <script src="popup.js"></script>
+</body>
+</html>

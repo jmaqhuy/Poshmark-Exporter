@@ -1,30 +1,42 @@
 {
   "manifest_version": 3,
   "name": "Poshmark Closet Exporter",
-  "version": "2.0",
-  "description": "Xuất tất cả sản phẩm và URL hình ảnh từ tủ đồ Poshmark sang tệp XLSX.",
+  "version": "2.5",
+  "description": "Xuất thông tin sản phẩm từ Poshmark, tải ảnh lên Cloudinary và lưu ra file XLSX.",
   "permissions": [
+    "storage",      
+    "scripting",    
     "activeTab",
-    "scripting",
-    "downloads"
+    "tabs"
   ],
   "host_permissions": [
-    "https://poshmark.com/*"
+    "https://poshmark.com/*",
+    "https://api.cloudinary.com/*" 
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "images/icon16.png",
       "48": "images/icon48.png",
       "128": "images/icon128.png"
-    },
-    "default_title": "Export Poshmark Closet"
-  },
-  "background": {
-    "service_worker": "background.js"
+    }
   },
   "icons": {
     "16": "images/icon16.png",
     "48": "images/icon48.png",
     "128": "images/icon128.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "xlsx.full.min.js",
+        "images/icon48.png",
+        "images/icon128.png"
+      ],
+      "matches": ["https://poshmark.com/*"]
+    }
+  ]
 }
